@@ -7,8 +7,9 @@ export ./cur\*.xml to json.
 To deal with the stock exchange the Ditto Nedo's Way
 
 #Compiling 
-Type:
+## Type, To Compile:
  gcc main.c -lxml2 -ljq
-To Compile, Hence You will need:
+
+## Hence You will need:
 	libxml
 	libjq
