@@ -1,4 +1,4 @@
-/*XXX This Document was modified on 1637058386 */
+/*XXX This Document was modified on 1637060102 */
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -248,17 +248,65 @@ static jv rt_deal_with_siblings ( xmlNodePtr n )
 
 jv rt_get_file ( char *path );
 jv rt_get_url ( char *path );
+jv rt_get_unit ( jv, char * );
+void rt_show ( jv, jv, jv );
 
 int main ( signed Argsc, char *( Args[] ) )
 {
  jv currencies = rt_load_json ( "currencies.xml" );
+#if 0
  jv rates =
      rt_get_url
      ( "https://www.ecb.europa.eu/stats/eurofxref/eurofxref-hist-90d.xml" );
- if( jv_is_valid ( rates ) )
-  jv_dumpf ( rates, stdout, 0 );
- //jv_dumpf ( currencies, stdout, 0 );
+#else
+ jv rates = rt_get_url ( "./rates.xml" );
+#endif
+ if( !jv_is_valid ( currencies ) )
+  return 1;
+ if( !jv_is_valid ( rates ) )
+  return 2;
+
+ jv stack = jv_object_get ( rates, jv_string ( "stack" ) );
+
+// Foreach, Element
+ for( int l = jv_array_length ( jv_copy ( stack ) ) - 1; l > -1; l-- ) {
+  jv el = jv_array_get ( jv_copy ( stack ), l );
+
+  jv rates = jv_object_get ( jv_copy ( el ), jv_string ( "rates" ) );
+  jv date = jv_object_get ( jv_copy ( el ), jv_string ( "time" ) );
+
+  rt_show ( date, rates, currencies );
+ }
+
  return 0;
+}
+
+void rt_show ( jv date, jv rates, jv currencies )
+{
+
+ jv_array_foreach ( jv_copy ( rates ), i, el )
+     //
+ {
+  jv curr = jv_object_get ( el, jv_string ( "currency" ) );
+  jv ob = rt_get_unit ( currencies, jv_string_value ( curr ) );
+  if( jv_is_valid ( ob ) ) {
+   ob = jv_object_get ( ob, jv_string ( "name" ) );
+   jv_dumpf ( ob, stdout, 0 );
+  }
+ }
+ exit ( 0 );
+}
+
+jv rt_get_unit ( jv ar, char *u )
+{
+ jv_array_foreach ( jv_copy ( ar ), i, el ) {
+  jv unit = jv_object_get ( jv_copy ( el ), jv_string ( "unit" ) );
+  if( jv_is_valid ( unit ) ) {
+   if( !strcmp ( jv_string_value ( unit ), u ) )
+	return jv_copy ( el );
+  }
+ }
+ return jv_invalid (  );
 }
 
 jv rt_get_file ( char *path )
