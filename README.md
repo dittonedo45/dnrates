@@ -15,5 +15,7 @@ To deal with the stock exchange the Ditto Nedo's Way
 	libjq
 
 ### On My Box I Compile it Like it like,
-	gcc main.c -ljq -lm /usr/lib/i386-linux-gnu/libxml2.so.2.9.3
+	gcc main.c -ljq -lm /usr/lib/i386-linux-gnu/libxml2.so.2.9.3 -lavformat -lavutil
 
+# Rates Fetch URL 
+	'https://www.ecb.europa.eu/stats/eurofxref/eurofxref-hist-90d.xml'

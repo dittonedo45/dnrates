@@ -1,4 +1,4 @@
-/*XXX This Document was modified on 1637057491 */
+/*XXX This Document was modified on 1637058386 */
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -247,12 +247,18 @@ static jv rt_deal_with_siblings ( xmlNodePtr n )
 }
 
 jv rt_get_file ( char *path );
+jv rt_get_url ( char *path );
 
 int main ( signed Argsc, char *( Args[] ) )
 {
  jv currencies = rt_load_json ( "currencies.xml" );
- jv rates = rt_get_file ( "./rates.xml" );
-
+ jv rates =
+     rt_get_url
+     ( "https://www.ecb.europa.eu/stats/eurofxref/eurofxref-hist-90d.xml" );
+ if( jv_is_valid ( rates ) )
+  jv_dumpf ( rates, stdout, 0 );
+ //jv_dumpf ( currencies, stdout, 0 );
+ return 0;
 }
 
 jv rt_get_file ( char *path )
@@ -321,3 +327,102 @@ jv rt_get_file ( char *path )
 
  return jv_copy ( maina );
 }
+
+#if 1
+#include <libavformat/avio.h>
+
+static int rt_avio_read ( void *d, char *b, int l )
+{
+ int ret = 0;
+
+ do {
+  ret = avio_read ( ( AVIOContext * ) d, b, l );
+  /// In case, the download get some petty errors ?
+ } while( ret != AVERROR_EOF && ret < 0 );
+
+ return ret;
+}
+
+static int rt_avio_close ( void *d )
+{
+ avio_close ( ( AVIOContext * ) d );
+ return 0;
+}
+
+jv rt_get_url ( char *path )
+{
+ jv maina = jv_object (  );
+ jv arr = jv_array (  );
+ AVIOContext *io = NULL;
+
+ int ret = 0;
+
+ av_log_set_callback ( 0 );
+ ret = avio_open ( &io, path, AVIO_FLAG_READ );
+
+ if( ret < 0 )
+  return jv_invalid (  );
+
+ xmlDocPtr doc =
+     xmlReadIO ( rt_avio_read, rt_avio_close, ( void * )io, path, "UTF-8", 0 );
+
+ if( !doc )
+  return jv_invalid (  );
+
+ xmlNodePtr nd = dn_get_el ( "Envelope", doc->children );
+ xmlNodePtr subject = dn_get_el ( "Envelope|subject", nd );
+ xmlNodePtr cubes = dn_get_ar ( "Cube", nd->children );
+
+ xmlNodePtr sender = dn_get_ar ( "Sender", nd->children );
+ do {
+  if( !sender )
+   break;
+  sender = dn_get_el ( "Sender|name", sender );
+  if( !sender )
+   break;
+  sender = ( sender->children );
+  if( !sender )
+   break;
+  maina = jv_object_set ( maina, jv_string ( "sender" ), jv_string
+                          ( sender->content ) );
+ } while( 0 );
+
+ do {
+  if( !cubes || !cubes->children )
+   break;
+
+  int i = 1;
+
+  jv obj = jv_object (  );
+
+  xmlNodePtr p = cubes->children;
+  while( p ) {
+   {
+	xmlAttrPtr n = p->properties;
+
+	if( !n || !n->name ) {
+	 p = p->next;
+	 continue;
+	}
+
+	obj = jv_object (  );
+	obj = jv_object_set ( obj, jv_string ( n->name ),
+	                      jv_string ( n->children->content ) );
+
+	obj =
+	    jv_object_set ( obj, jv_string ( "rates" ),
+	                    rt_deal_with_siblings ( p->children ) );
+	arr = jv_array_append ( arr, obj );
+	p = p->next;
+   }
+  }
+
+  break;
+ }
+ while( 0 );
+
+ maina = jv_object_set ( maina, jv_string ( "stack" ), jv_copy ( arr ) );
+
+ return jv_copy ( maina );
+}
+#endif
