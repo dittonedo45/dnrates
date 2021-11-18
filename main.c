@@ -1,4 +1,4 @@
-/*XXX This Document was modified on 1637060102 */
+/*XXX This Document was modified on 1637133315 */
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -254,7 +254,7 @@ void rt_show ( jv, jv, jv );
 int main ( signed Argsc, char *( Args[] ) )
 {
  jv currencies = rt_load_json ( "currencies.xml" );
-#if 0
+#if 1
  jv rates =
      rt_get_url
      ( "https://www.ecb.europa.eu/stats/eurofxref/eurofxref-hist-90d.xml" );
@@ -287,14 +287,12 @@ void rt_show ( jv date, jv rates, jv currencies )
  jv_array_foreach ( jv_copy ( rates ), i, el )
      //
  {
-  jv curr = jv_object_get ( el, jv_string ( "currency" ) );
-  jv ob = rt_get_unit ( currencies, jv_string_value ( curr ) );
-  if( jv_is_valid ( ob ) ) {
-   ob = jv_object_get ( ob, jv_string ( "name" ) );
-   jv_dumpf ( ob, stdout, 0 );
+  jv curr = jv_object_get ( jv_copy ( el ), jv_string ( "currency" ) );
+  if( !strcmp ( jv_string_value ( curr ), "USD" ) ) {
+   jv_dumpf ( date, stdout, 0 );
+   jv_dumpf ( el, stdout, 0 );
   }
  }
- exit ( 0 );
 }
 
 jv rt_get_unit ( jv ar, char *u )
