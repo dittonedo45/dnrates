@@ -41,7 +41,8 @@ Else if the **main** function is like *To use the the imaginary rates file*:
 	 jv rates = rt_get_url ( "./rates.xml" );
 	 ```
 	`make && ./a.out`
-
+Example Image:
+![Online on **Thu Nov 18 08:11:10 CAT 2021**](./example.png)
 
 ### On My Box I Compile it Like it like,
 	gcc main.c -ljq -lm /usr/lib/i386-linux-gnu/libxml2.so.2.9.3 -lavformat -lavutil
