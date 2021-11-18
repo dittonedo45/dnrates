@@ -16,7 +16,7 @@ To deal with the stock exchange the Ditto Nedo's Way
 ### Image Example, Getting Stock Exchange history for (last 90 days)
 
 if in the main function the `jv rates` object is:
-	```
+```
 	int main ( signed Argsc, char *( Args[] ) )
 	{
 	 jv currencies = rt_load_json ( "currencies.xml" );
@@ -26,10 +26,10 @@ if in the main function the `jv rates` object is:
 	     ( "https://www.ecb.europa.eu/stats/eurofxref/eurofxref-hist-90d.xml" );
 	#else
 
-	```
+```
 	`make && ./a.out`
 Else if the **main** function is like *To use the the imaginary rates file*:
-	```
+```
 	int main ( signed Argsc, char *( Args[] ) )
 	{
 	 jv currencies = rt_load_json ( "currencies.xml" );
@@ -39,7 +39,7 @@ Else if the **main** function is like *To use the the imaginary rates file*:
 	     ( "https://www.ecb.europa.eu/stats/eurofxref/eurofxref-hist-90d.xml" );
 	#else
 	 jv rates = rt_get_url ( "./rates.xml" );
-	 ```
+```
 	`make && ./a.out`
 Example Image:
 ![Online on **Thu Nov 18 08:11:10 CAT 2021**](./example.png)
