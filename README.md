@@ -27,7 +27,7 @@ if in the main function the `jv rates` object is:
 	#else
 
 ```
-	`make && ./a.out`
+```make && ./a.out```
 Else if the **main** function is like *To use the the imaginary rates file*:
 ```
 	int main ( signed Argsc, char *( Args[] ) )
@@ -40,8 +40,25 @@ Else if the **main** function is like *To use the the imaginary rates file*:
 	#else
 	 jv rates = rt_get_url ( "./rates.xml" );
 ```
-	`make && ./a.out`
-Example Image:
+```make && ./a.out```
+
+###  Example Image (modify *rt_show* "USD" to your prefered currency code):
+
+```
+void rt_show ( jv date, jv rates, jv currencies )
+{
+
+ jv_array_foreach ( jv_copy ( rates ), i, el )
+     //
+ {
+  jv curr = jv_object_get ( jv_copy ( el ), jv_string ( "currency" ) );
+  if( !strcmp ( jv_string_value ( curr ), "USD" ) ) {
+   jv_dumpf ( date, stdout, 0 );
+   jv_dumpf ( el, stdout, 0 );
+  }
+ }
+}
+```
 ![Online on **Thu Nov 18 08:11:10 CAT 2021**](./example.png)
 
 ### On My Box I Compile it Like it like,
