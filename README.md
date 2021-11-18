@@ -65,5 +65,5 @@ void rt_show ( jv date, jv rates, jv currencies )
 	gcc main.c -ljq -lm /usr/lib/i386-linux-gnu/libxml2.so.2.9.3 -lavformat -lavutil
 
 #### Rates Fetch URL 
-	'https://www.ecb.europa.eu/stats/eurofxref/eurofxref-hist-90d.xml'
+```https://www.ecb.europa.eu/stats/eurofxref/eurofxref-hist-90d.xml```
 
