@@ -16,7 +16,7 @@ To deal with the stock exchange the Ditto Nedo's Way
 ### Image Example, Getting Stock Exchange history for (last 90 days)
 
 if in the main function the `jv rates` object is:
-```
+```C
 	int main ( signed Argsc, char *( Args[] ) )
 	{
 	 jv currencies = rt_load_json ( "currencies.xml" );
@@ -27,9 +27,11 @@ if in the main function the `jv rates` object is:
 	#else
 
 ```
-```make && ./a.out```
-Else if the **main** function is like *To use the the imaginary rates file*:
+```bash
+make && ./a.out
 ```
+Else if the **main** function is like *To use the the imaginary rates file*:
+```C
 	int main ( signed Argsc, char *( Args[] ) )
 	{
 	 jv currencies = rt_load_json ( "currencies.xml" );
@@ -44,7 +46,7 @@ Else if the **main** function is like *To use the the imaginary rates file*:
 
 ###  Example Image (modify *rt_show* "USD" to your prefered currency code):
 
-```
+```C
 void rt_show ( jv date, jv rates, jv currencies )
 {
 
