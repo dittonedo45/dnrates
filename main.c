@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <libxml2/parser.h>
+#include <libxml2/libxml/parser.h>
 #include <jv.h>
 #include <string.h>
 
