@@ -5,6 +5,7 @@
 #include <libxml2/libxml/parser.h>
 #include <jv.h>
 #include <string.h>
+#include <jansson.h>
 
 xmlNodePtr dn_skip_txt(xmlNodePtr d)
 {
@@ -250,12 +251,12 @@ static jv rt_deal_with_siblings(xmlNodePtr n)
 jv rt_get_file(char *path);
 jv rt_get_url(char *path);
 jv rt_get_unit(jv, char *);
-void rt_show(jv, jv, jv);
+void rt_show(json_t *, jv, jv, jv);
 
 int main(signed Argsc, char *(Args[]))
 {
     jv currencies = rt_load_json("currencies.xml");
-#if 1
+#if 0
     jv rates =
 	rt_get_url
 	("https://www.ecb.europa.eu/stats/eurofxref/eurofxref-hist-90d.xml");
@@ -270,30 +271,53 @@ int main(signed Argsc, char *(Args[]))
     jv stack = jv_object_get(rates, jv_string("stack"));
 
 // Foreach, Element
+    json_t *ara = json_array();
+
     for (int l = jv_array_length(jv_copy(stack)) - 1; l > -1; l--) {
 	jv el = jv_array_get(jv_copy(stack), l);
 
 	jv rates = jv_object_get(jv_copy(el), jv_string("rates"));
 	jv date = jv_object_get(jv_copy(el), jv_string("time"));
 
-	rt_show(date, rates, currencies);
+	json_t *ob = json_object();
+	{
+	    json_t *ar = json_array();
+	    rt_show(ar, date, rates, currencies);
+	    json_object_set(ob, jv_string_value(date), ar);
+	}
+	json_array_append(ara, ob);
+
     }
+
+    json_dumpf(ara, stdout, 0);
 
     return 0;
 }
 
-void rt_show(jv date, jv rates, jv currencies)
+void rt_show(json_t * arrr, jv date, jv rates, jv currencies)
 {
+    json_t *cur =
+	json_loads(jv_string_value(jv_dump_string(jv_copy(currencies), 0)),
+		   0, 0);
+    json_t *rat =
+	json_loads(jv_string_value(jv_dump_string(jv_copy(rates), 0)),
+		   0, 0);
+    if (!rat)
+	return;
+    json_t *ar = json_array();
 
-    jv_array_foreach(jv_copy(rates), i, el)
-	//
+    int i;
+    json_t *e;
+
+    json_array_foreach(rat, i, e)
+	//.
     {
-	jv curr = jv_object_get(jv_copy(el), jv_string("currency"));
-	if (!strcmp(jv_string_value(curr), "USD")) {
-	    jv_dumpf(date, stdout, 0);
-	    jv_dumpf(el, stdout, 0);
-	}
+	json_t *rs = json_object_get(e, "rate");
+
+	json_array_append(ar, rs);
     }
+
+    json_array_append(arrr, ar);
 }
 
 jv rt_get_unit(jv ar, char *u)
